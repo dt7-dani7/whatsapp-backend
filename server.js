@@ -16,6 +16,7 @@ const pusher = new Pusher({
     useTLS: true
   });
 
+
   // middleware
 app.use(express.json())
 //DB config
@@ -24,7 +25,20 @@ mongoose.connect(connection_url, {
     useCreateIndex: true,
     useNewUrlParser: true,
     useUnifiedTopology: true
-})
+});
+
+const db = mongoose.connection;
+
+db.once('open', () =>{
+    console.log("DB Connected");
+
+    const msgCollection = db.collection("messagecontents");
+    const changeStream = msgCollection.watch();
+
+    changeStream.on('change',(change)=>{
+        console.log(change);
+    });
+});
 //?????
 
 // api routes
